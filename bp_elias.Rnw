@@ -1,0 +1,94 @@
+\documentclass{article}
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{url}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{
+ pdfstartview={XYZ null null 1}}
+\usepackage{breakurl}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{xcolor}
+\usepackage[mathscr]{euscript}
+
+\usepackage{lstbayes}
+\usepackage{bigints}
+
+\newcommand{\betadistribution}[1]{\ensuremath{\frac{1}{B(\alpha,\beta)} (#1)^{(\alpha - 1)}(1 - #1)^{\beta -1 }}}
+\newcommand{\binomialdistribution}{\ensuremath{ \binom{N}{y} \theta^{y}(1 - \theta)^{N-y}  }}
+%%\newcommand{\inversegammadistribution}[1]{\ensuremath{\frac{\beta^{\alpha}}{\Gamma{(\alpha)}} (#1)^{-(\alpha + 1)}\exp{\left(\frac{-\beta}{#1} \right)}  }}
+\newcommand{\inversegammadistribution}[1]{\ensuremath{\frac{\beta^{\alpha}}{\Gamma{(\alpha)}} \left(\frac{1}{#1}\right)^{\alpha + 1}\exp{\left(-\frac{\beta}{#1} \right)}  }}
+\newcommand{\normaldistributionlik}{\ensuremath{\left( \frac{1}{\sqrt{2\pi\sigma^2}}  \right)^{n} \exp{\left(- \frac{1}{2\sigma^2}\left[ n(\mu - \bar{x})^2 + s^2 \right]   \right) }        }}
+\newcommand{\normaldistribution}{\ensuremath{\frac{1}{\sqrt{2\pi\sigma^2}} \exp{\left(-\frac{1}{2\sigma^2}(x - \mu)^2  \right)}  } }
+\newcommand{\normalD}[3]{\ensuremath{\frac{1}{\sqrt{2\pi#1^2}} \exp{\left(-\frac{1}{2 #1^2}(#3 - #2)^2  \right)}  } }
+
+\usepackage[]{imakeidx}
+\makeindex
+
+\begin{document}
+
+\title{R package bp}
+
+\author{Elias Ardila}
+
+\maketitle
+
+\section{Data}
+Load Dataset.
+<<>>=
+library(bp)
+@ 
+<<message=FALSE,results='hide',warnings=FALSE>>=
+elias <- read.csv("elias.csv", sep=",")
+@ 
+\section{Fitted Model}
+<<message=FALSE,results='hide',warnings=FALSE>>=
+eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='id',hr='hr')
+@ 
+\section{Plots}
+<<plot1,echo=FALSE,fig.width=6, fig.height=4,fig.align='center', out.width='.8\\linewidth' >>=
+bp_ts_plots(eliasbp)[[1]]
+@ 
+<<plot2,echo=FALSE,fig.width=6, fig.height=4,fig.align='center', out.width='.8\\linewidth' >>=
+bp_ts_plots(eliasbp)[[2]]
+@ 
+<<plot3,echo=FALSE,fig.width=6, fig.height=6,fig.align='center', out.width='.8\\linewidth' >>=
+bp_scatter(eliasbp)
+@ 
+
+\begin{center}
+  \begin{tabular}{c|c|c}
+    BP Stage & Systolic(mmHg) & Diastolic(mmHg)\\
+    \hline
+     Low (optional) &	<100  &	and 	<60   \\
+     Normal  &	<120 	& and 	<80 \\
+     Elevated &	120 - 129  &	and 	<80\\
+     Stage 1 - All &	130 - 139 &	and 	80 - 89\\
+     Stage 1 - ISH (ISH - S1) & 130 - 139 & 	and 	<80\\
+     Stage 1 - IDH (IDH - S1) &	<130 	&and 	80 - 89 \\
+     Stage 2 - All  &	>140  &	and 	>90\\
+     Stage 2 - ISH (ISH - S2)  &	>140 & 	and 	<90\\
+     Stage 2 - IDH (IDH - S2) &	<140 	& and 	>90 \\
+     Crisis (optional) &	>180 & 	or 	>120\\
+     \hline
+   \end{tabular}
+\end{center}
+\newpage
+<<plot4,echo=FALSE,fig.width=6, fig.height=6,fig.align='center', out.width='.8\\linewidth' >>=
+bp_hist(eliasbp)[[1]]
+@ 
+\newpage
+<<plot5,echo=FALSE,fig.width=6, fig.height=4,fig.align='center', out.width='.8\\linewidth' >>=
+bp_hist(eliasbp)[[2]]
+@ 
+<<plot6,echo=FALSE,fig.width=6, fig.height=4,fig.align='center', out.width='.8\\linewidth' >>=
+bp_hist(eliasbp)[[3]]
+@ 
+\printindex
+\end{document}
