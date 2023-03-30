@@ -47,4 +47,4 @@ bp_hist(eliasbp)[[2]]
 bp_hist(eliasbp)[[3]]
 ```
 
-![](../R/images/hist2.png)
+![](../R/images/hist3.png)
