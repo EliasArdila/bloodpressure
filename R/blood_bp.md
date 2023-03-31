@@ -84,7 +84,7 @@ bp_scatter(eliasbp)
 ![](../R/images/scatter.png)
 
 
-##  American Heart Association Classification
+##  Classification by American Heart Association
 
 | Blood Pressure Category |	Systolic (mmHg) 	|	Diastolic (mmHg) |
 | ---------|:---------------:|-----------------:|                     
