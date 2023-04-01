@@ -1,50 +1,57 @@
+---
+title: "R package bp"
+output: html_document
+author: "Elias Ardila"
+---
+
 # Data
 
 Load Dataset.
 
-``` r
+```{r load,message=FALSE}
 library(bp)
 ```
 
-``` r
+```{r read data,message=FALSE,warnings=FALSE}
 elias <- read.csv("elias.csv", sep=",")
 ```
 
 # Fitted Model
-``` r 
+```{r create}
 eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='id',hr='hr')
 ```
 
 # Plots
 
-## LOESS of BP ~ Days
+## LOESS  BP ~ Days
 
-``` r 
+```{r plot1,message=FALSE,results='hide',echo=FALSE}
 bp_ts_plots(eliasbp)[[1]]
+png('images/datetime.png')
+bp_ts_plots(eliasbp)[[1]]
+dev.off()
 ```
-![](images/datetime.png)
 
+## LOESS BP ~ Hour
 
-## LOESS of BP ~ Hour
-
-
-``` r
+```{r plot2,message=FALSE,results='hide',echo=FALSE}
 bp_ts_plots(eliasbp)[[2]]
+png('images/hour.png')
+bp_ts_plots(eliasbp)[[2]]
+dev.off()
 ```
-![](images/hour.png)
-
 
 ## All BP values
 
-
-``` r 
+```{r plot4,message=FALSE,results='hide',echo=FALSE}
 bp_hist(eliasbp)[[1]]
+png('images/hist1.png')
+bp_hist(eliasbp)[[1]]
+dev.off()
 ```
 
 ## BP Classification by (Lee et al 2000)
 
-
-![](images/hist1.png)
 
    | BP Stage | Systolic(mmHg) | Diastolic(mmHg) |
    | ---------|:---------------:|-----------------:|
@@ -60,29 +67,31 @@ bp_hist(eliasbp)[[1]]
    |  Crisis (optional) |	>180 | 	or 	>120|
 
 ## Systolic
-
-``` r
+    
+```{r plot5,message=FALSE,results='hide',echo=FALSE}
 bp_hist(eliasbp)[[2]]
+png('images/hist2.png')
+bp_hist(eliasbp)[[2]]
+dev.off()
 ```
-
-![](images/hist2.png)
 
 ## Diastolic
 
-``` r
+```{r plot6,message=FALSE,results='hide',echo=FALSE}
 bp_hist(eliasbp)[[3]]
+png('images/hist3.png')
+bp_hist(eliasbp)[[3]]
+dev.off()
 ```
-
-![](images/hist2.png)
-
 
 ## Scatterplot BP  Systolic ~ Diastolic
 
-``` r
+```{r plot3,message=FALSE,results='hide',echo=FALSE}
 bp_scatter(eliasbp)
+png('images/scatter.png')
+bp_scatter(eliasbp)
+dev.off()
 ```
-![](images/scatter.png)
-
 
 ##  American Heart Association Classification
 
@@ -96,15 +105,20 @@ bp_scatter(eliasbp)
 |Hypertensive Crisis  |	Higher than 180    | 	and/or 	Higher than 120 |
 
 
-```r
+```{r stages}
 eliasstages <- bp_stages(elias,sbp='syst',dbp='diast',bp_type="ap")
 dummysbp <- table(eliasstages$SBP_CATEGORY)
 dummydbp <- table(eliasstages$DBP_CATEGORY)
 ```
 
+```{r,message=FALSE,results='hide',echo=FALSE}
+sbpstages <- c(dummysbp[2], dummysbp[1],dummysbp[3],dummysbp[4])
+dbpstages <- dummydbp
+```
+
 ## Systolic 
 
-```r 
+```{r }
 df <- data.frame(dummysbp)
 colnames(df) <- c("Class","Freq")
 ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2")),y=Freq,fill=Class)) +
@@ -112,11 +126,19 @@ ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2
        scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none')
 ```
 
-![](images/sbpstages.png)
+```{r plotapsbp, message=FALSE,results='hide',echo=FALSE}
+##barplot(sbpstages,col=c("green","yellow","orange","red"))
+##grid(nx=NA,ny=NULL)
+png('images/sbpstages.png')
+ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2")),y=Freq,fill=Class)) +
+       geom_bar(stat='identity')  +
+       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none')
+dev.off()
+```
 
 ## Diastolic
 
-``` r
+```{r }
 df2 <- data.frame(dummydbp)
 colnames(df2) <- c("Class","Freq")
 ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
@@ -124,5 +146,14 @@ ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
        scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none')
 ```
 
-![](images/dbpstages.png)
+```{r plotapdbp, message=FALSE,results='hide',echo=FALSE}
+##barplot(dbpstages,col=c("green","orange","red"))
+##grid(nx=NA,ny=NULL)
+png('images/dbpstages.png')
+ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
+       geom_bar(stat='identity')  +
+       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none')
+dev.off()
+```
+
 
