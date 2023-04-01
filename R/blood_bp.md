@@ -73,7 +73,7 @@ bp_hist(eliasbp)[[2]]
 bp_hist(eliasbp)[[3]]
 ```
 
-![](images/hist2.png)
+![](images/hist3.png)
 
 
 ## Scatterplot BP  Systolic ~ Diastolic
