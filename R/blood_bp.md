@@ -126,3 +126,23 @@ ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
 
 ![](images/dbpstages.png)
 
+# Blood Pressure Metrics
+
+## Coefficient of Variation (Munter et al 2011)
+
+![](images/coeffvar.png)
+
+
+## Average Real Variability (Mena et al 2005)
+
+![](images/avvar.png)
+
+
+## Succesive Variation (Munter et al 2011)
+
+![](images/sucvar.png)
+
+
+## Blood Pressure Magnitude (peak and trough) (Munter et al 2011)
+
+![](images/pressmag.png)

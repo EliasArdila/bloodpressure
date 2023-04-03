@@ -10,6 +10,11 @@ Load Dataset.
 
 ```{r load,message=FALSE}
 library(bp)
+library(ggplot2)
+library(rmarkdown)
+library(kableExtra)
+##library(xtable)
+library(gridExtra)
 ```
 
 ```{r read data,message=FALSE,warnings=FALSE}
@@ -157,3 +162,65 @@ dev.off()
 ```
 
 
+# Blood Pressure Metrics
+
+## Coefficient of Variation (Munter et al 2011)
+
+```{r variation}
+kv <- bp_cv(eliasbp)
+kv[,-1] <- round(kv[,-1],2)
+kv %>% kbl() %>% kable_paper("hover",full_width=FALSE)
+```
+
+```{r variat, echo=FALSE,message=FALSE,results='hide'}
+png("images/coeffvar.png",height=200,width=1000)
+xxx <- tableGrob(kv,rows=NULL)
+grid.arrange(xxx)
+dev.off()
+```
+
+## Average Real Variability (Mena et al 2005)
+
+```{r avr}
+wv <- bp_arv(eliasbp)
+wv[,-1] <- round(wv[,-1],2)
+wv %>% kbl() %>% kable_paper("hover",full_width=FALSE)
+```
+
+```{r avvar, echo=FALSE,message=FALSE,results='hide'}
+png("images/avvar.png",height=200,width=1000)
+xxx <- tableGrob(wv,rows=NULL)
+grid.arrange(xxx)
+dev.off()
+```
+
+
+## Succesive Variation (Munter et al 2011)
+
+```{r sucv}
+scv <- bp_sv(eliasbp)
+scv[,-1] <- round(scv[,-1],2)
+scv %>% kbl() %>% kable_paper("hover",full_width=FALSE)
+```
+
+```{r sucvar, echo=FALSE,message=FALSE,results='hide'}
+png("images/sucvar.png",height=200,width=1000)
+xxx <- tableGrob(scv,rows=NULL)
+grid.arrange(xxx)
+dev.off()
+```
+
+## Blood Pressure Magnitude (peak and trough) (Munter et al 2011)
+
+```{r presmag}
+psm <- bp_mag(eliasbp)
+psm[,-1] <- round(psm[,-1],2)
+psm %>% kbl() %>% kable_paper("hover",full_width=FALSE)
+```
+
+```{r pressmag, echo=FALSE,message=FALSE,results='hide'}
+png("images/pressmag.png",height=200,width=1000)
+xxx <- tableGrob(psm,rows=NULL)
+grid.arrange(xxx)
+dev.off()
+```
