@@ -22,6 +22,7 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 ``` r 
 bp_ts_plots(eliasbp)[[1]]
 ```
+
 ![](images/datetime.png)
 
 
@@ -43,9 +44,6 @@ bp_hist(eliasbp)[[1]]
 
 ## BP Classification by (Lee et al 2000)
 
-
-![](images/hist1.png)
-
    | BP Stage | Systolic(mmHg) | Diastolic(mmHg) |
    | ---------|:---------------:|-----------------:|
    |  Low (optional) |	<100  |	and 	<60   |
@@ -58,6 +56,9 @@ bp_hist(eliasbp)[[1]]
    |  Stage 2 - ISH (ISH - S2)  |	>140 | 	and 	<90|
    |  Stage 2 - IDH (IDH - S2) |	<140 	| and 	>90 |
    |  Crisis (optional) |	>180 | 	or 	>120|
+
+
+![](images/hist1.png)
 
 ## Systolic
 
@@ -83,6 +84,13 @@ bp_scatter(eliasbp)
 ```
 ![](images/scatter.png)
 
+## Day of Week
+
+![](images/daysofweek.png)
+
+## Time of Day
+
+![](images/timeday.png)
 
 ##  American Heart Association Classification
 
@@ -138,7 +146,7 @@ ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
 ![](images/avvar.png)
 
 
-## Succesive Variation (Munter et al 2011)
+## Successive Variation (Munter et al 2011)
 
 ![](images/sucvar.png)
 

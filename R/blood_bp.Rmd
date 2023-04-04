@@ -8,7 +8,10 @@ author: "Elias Ardila"
 
 Load Dataset.
 
-```{r load,message=FALSE}
+```{r setenv,message=FALSE,results='hide'}
+Sys.setlocale("LC_TIME","en_US.UTF-8")
+```
+```{r loaddata,message=FALSE}
 library(bp)
 library(ggplot2)
 library(rmarkdown)
@@ -19,18 +22,20 @@ library(gridExtra)
 
 ```{r read data,message=FALSE,warnings=FALSE}
 elias <- read.csv("elias.csv", sep=",")
+elias$DATE <- as.Date(elias$DATE,format="%Y-%m-%d")
 ```
 
 # Fitted Model
 ```{r create}
-eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='id',hr='hr')
+eliasbp <- process_data(elias,sbp='syst',dbp='diast', 
+                        date_time='date.time',id='id',hr='hr')
 ```
 
 # Plots
 
 ## LOESS  BP ~ Days
 
-```{r plot1,message=FALSE,results='hide',echo=FALSE}
+```{r plot1,message=FALSE,results='hide',echo=FALSE,fig.align='center'}
 bp_ts_plots(eliasbp)[[1]]
 png('images/datetime.png')
 bp_ts_plots(eliasbp)[[1]]
@@ -39,21 +44,13 @@ dev.off()
 
 ## LOESS BP ~ Hour
 
-```{r plot2,message=FALSE,results='hide',echo=FALSE}
+```{r plot2,message=FALSE,results='hide',echo=FALSE,fig.align='center'}
 bp_ts_plots(eliasbp)[[2]]
 png('images/hour.png')
 bp_ts_plots(eliasbp)[[2]]
 dev.off()
 ```
 
-## All BP values
-
-```{r plot4,message=FALSE,results='hide',echo=FALSE}
-bp_hist(eliasbp)[[1]]
-png('images/hist1.png')
-bp_hist(eliasbp)[[1]]
-dev.off()
-```
 
 ## BP Classification by (Lee et al 2000)
 
@@ -71,9 +68,20 @@ dev.off()
    |  Stage 2 - IDH (IDH - S2) |	<140 	| and 	>90 |
    |  Crisis (optional) |	>180 | 	or 	>120|
 
+
+## All BP values
+
+```{r plot4,message=FALSE,results='hide',echo=FALSE, fig.align='center'}
+bp_hist(eliasbp)[[1]]
+png('images/hist1.png')
+bp_hist(eliasbp)[[1]]
+dev.off()
+```
+
+
 ## Systolic
     
-```{r plot5,message=FALSE,results='hide',echo=FALSE}
+```{r plot5,message=FALSE,results='hide',echo=FALSE,fig.align='center'}
 bp_hist(eliasbp)[[2]]
 png('images/hist2.png')
 bp_hist(eliasbp)[[2]]
@@ -82,7 +90,7 @@ dev.off()
 
 ## Diastolic
 
-```{r plot6,message=FALSE,results='hide',echo=FALSE}
+```{r plot6,message=FALSE,results='hide',echo=FALSE,fig.align='center'}
 bp_hist(eliasbp)[[3]]
 png('images/hist3.png')
 bp_hist(eliasbp)[[3]]
@@ -91,10 +99,49 @@ dev.off()
 
 ## Scatterplot BP  Systolic ~ Diastolic
 
-```{r plot3,message=FALSE,results='hide',echo=FALSE}
+```{r plot3,message=FALSE,results='hide',echo=FALSE,fig.align='center'}
 bp_scatter(eliasbp)
 png('images/scatter.png')
 bp_scatter(eliasbp)
+dev.off()
+```
+
+## Day of Week
+
+
+```{r plotdayweek}
+tage <- bp_tables(eliasbp)$CLASS_Day_of_Week
+newnames <- c(rownames(tage),"Sum")
+sumtage <- apply(tage[,1:8],2,sum)
+rownames(tage) = NULL
+tage <- rbind(tage,sumtage)
+rownames(tage) <- newnames
+tage%>% kbl() %>% kable_paper("hover",full_width=FALSE)
+```
+
+```{r daysbp, echo=FALSE,message=FALSE,results='hide'}
+png("images/daysofweek.png",height=200,width=800)
+xxx <- tableGrob(tage)
+grid.arrange(xxx)
+dev.off()
+```
+
+## Time of Day
+
+```{r }
+timeday <- bp_tables(eliasbp)$CLASS_Time_of_Day
+newnames <- c(rownames(timeday),"Sum")
+sumtimeday <- apply(timeday[,1:5],2,sum)
+rownames(timeday) = NULL
+timeday <- rbind(timeday,sumtimeday)
+rownames(timeday) <- newnames
+timeday %>% kbl() %>% kable_paper("hover",full_width=FALSE)
+```
+
+```{r daysbpx, echo=FALSE,message=FALSE,results='hide'}
+png("images/timeday.png",height=200,width=800)
+xxx <- tableGrob(timeday)
+grid.arrange(xxx)
 dev.off()
 ```
 
@@ -123,12 +170,12 @@ dbpstages <- dummydbp
 
 ## Systolic 
 
-```{r }
+```{r barplot1, fig.align='center'}
 df <- data.frame(dummysbp)
 colnames(df) <- c("Class","Freq")
 ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2")),y=Freq,fill=Class)) +
-       geom_bar(stat='identity')  +
-       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none')
+       geom_bar(stat='identity',alpha=0.65,color='gray57')  +
+       scale_fill_manual(values = c("Normal"="darkgreen","Elevated"="yellow","Stage 1"="orangered1","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none') + theme_minimal()
 ```
 
 ```{r plotapsbp, message=FALSE,results='hide',echo=FALSE}
@@ -136,19 +183,19 @@ ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2
 ##grid(nx=NA,ny=NULL)
 png('images/sbpstages.png')
 ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2")),y=Freq,fill=Class)) +
-       geom_bar(stat='identity')  +
-       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none')
+       geom_bar(stat='identity',alpha=0.65, color='gray57')  +
+       scale_fill_manual(values = c("Normal"="darkgreen","Elevated"="yellow","Stage 1"="orangered1","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none') + theme_minimal()
 dev.off()
 ```
 
 ## Diastolic
 
-```{r }
+```{r barplot2, fig.align='center' }
 df2 <- data.frame(dummydbp)
 colnames(df2) <- c("Class","Freq")
 ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
-       geom_bar(stat='identity')  +
-       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none')
+       geom_bar(stat='identity',alpha=0.65, color='gray57')  +
+       scale_fill_manual(values = c("Normal"="darkgreen","Elevated"="yellow","Stage 1"="orangered1","Stage 2"="red") ) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none') + theme_minimal()
 ```
 
 ```{r plotapdbp, message=FALSE,results='hide',echo=FALSE}
@@ -156,8 +203,8 @@ ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
 ##grid(nx=NA,ny=NULL)
 png('images/dbpstages.png')
 ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
-       geom_bar(stat='identity')  +
-       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none')
+       geom_bar(stat='identity',alpha=0.65,color='gray57')  +
+       scale_fill_manual(values = c("Normal"="darkgreen","Elevated"="yellow","Stage 1"="orangered1","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none') + theme_minimal()
 dev.off()
 ```
 
@@ -173,7 +220,7 @@ kv %>% kbl() %>% kable_paper("hover",full_width=FALSE)
 ```
 
 ```{r variat, echo=FALSE,message=FALSE,results='hide'}
-png("images/coeffvar.png",height=200,width=1000)
+png("images/coeffvar.png",height=200,width=800)
 xxx <- tableGrob(kv,rows=NULL)
 grid.arrange(xxx)
 dev.off()
@@ -188,14 +235,14 @@ wv %>% kbl() %>% kable_paper("hover",full_width=FALSE)
 ```
 
 ```{r avvar, echo=FALSE,message=FALSE,results='hide'}
-png("images/avvar.png",height=200,width=1000)
+png("images/avvar.png",height=200,width=800)
 xxx <- tableGrob(wv,rows=NULL)
 grid.arrange(xxx)
 dev.off()
 ```
 
 
-## Succesive Variation (Munter et al 2011)
+## Successive Variation (Munter et al 2011)
 
 ```{r sucv}
 scv <- bp_sv(eliasbp)
@@ -204,7 +251,7 @@ scv %>% kbl() %>% kable_paper("hover",full_width=FALSE)
 ```
 
 ```{r sucvar, echo=FALSE,message=FALSE,results='hide'}
-png("images/sucvar.png",height=200,width=1000)
+png("images/sucvar.png",height=200,width=800)
 xxx <- tableGrob(scv,rows=NULL)
 grid.arrange(xxx)
 dev.off()
@@ -219,7 +266,7 @@ psm %>% kbl() %>% kable_paper("hover",full_width=FALSE)
 ```
 
 ```{r pressmag, echo=FALSE,message=FALSE,results='hide'}
-png("images/pressmag.png",height=200,width=1000)
+png("images/pressmag.png",height=200,width=800)
 xxx <- tableGrob(psm,rows=NULL)
 grid.arrange(xxx)
 dev.off()
