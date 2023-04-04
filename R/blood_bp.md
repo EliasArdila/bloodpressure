@@ -19,30 +19,23 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 
 ## LOESS of BP ~ Days
 
-``` r 
-bp_ts_plots(eliasbp)[[1]]
-```
+[//]:<>(![](images/datetime.png))
 
-![](images/datetime.png)
-
+<p align="center" width="100%">
+   <img width="50%" src="images/datetime.png"> 
+</p>
 
 ## LOESS of BP ~ Hour
 
+[//]:<>(![](images/hour.png))
 
-``` r
-bp_ts_plots(eliasbp)[[2]]
-```
-![](images/hour.png)
+<p align="center" width="100%">
+   <img width="50%" src="images/hour.png"> 
+</p>
 
-
-## All BP values
-
-
-``` r 
-bp_hist(eliasbp)[[1]]
-```
 
 ## BP Classification by (Lee et al 2000)
+
 
    | BP Stage | Systolic(mmHg) | Diastolic(mmHg) |
    | ---------|:---------------:|-----------------:|
@@ -57,40 +50,60 @@ bp_hist(eliasbp)[[1]]
    |  Stage 2 - IDH (IDH - S2) |	<140 	| and 	>90 |
    |  Crisis (optional) |	>180 | 	or 	>120|
 
+## All BP values
 
-![](images/hist1.png)
+[//]:<>(![](images/hist1.png))
+
+<p align="center" width="100%">
+   <img width="50%" src="images/hist1.png"> 
+</p>
+
 
 ## Systolic
 
-``` r
-bp_hist(eliasbp)[[2]]
-```
+[//]:<>(![](images/hist2.png))
 
-![](images/hist2.png)
+<p align="center" width="100%">
+   <img width="50%" src="images/hist2.png"> 
+</p>
+
 
 ## Diastolic
 
-``` r
-bp_hist(eliasbp)[[3]]
-```
+[//]:<>(![](images/hist3.png))
 
-![](images/hist3.png)
+<p align="center" width="100%">
+   <img width="50%" src="images/hist3.png"> 
+</p>
 
 
 ## Scatterplot BP  Systolic ~ Diastolic
 
-``` r
-bp_scatter(eliasbp)
-```
-![](images/scatter.png)
+
+[//]:<>(![](images/scatter.png))
+
+<p align="center" width="100%">
+   <img width="50%" src="images/scatter.png"> 
+</p>
+
 
 ## Day of Week
 
-![](images/daysofweek.png)
+[//]:<>(![](images/daysofweek.png))
+
+<p align="center" width="100%">
+   <img width="80%" src="images/daysofweek.png"> 
+</p>
+
 
 ## Time of Day
 
-![](images/timeday.png)
+[//]:<>(![](images/timeday.png))
+
+<p align="center" width="100%">
+   <img width="80%" src="images/timeday.png"> 
+</p>
+
 
 ##  American Heart Association Classification
 
@@ -104,35 +117,23 @@ bp_scatter(eliasbp)
 |Hypertensive Crisis  |	Higher than 180    | 	and/or 	Higher than 120 |
 
 
-```r
-eliasstages <- bp_stages(elias,sbp='syst',dbp='diast',bp_type="ap")
-dummysbp <- table(eliasstages$SBP_CATEGORY)
-dummydbp <- table(eliasstages$DBP_CATEGORY)
-```
-
 ## Systolic 
 
-```r 
-df <- data.frame(dummysbp)
-colnames(df) <- c("Class","Freq")
-ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2")),y=Freq,fill=Class)) +
-       geom_bar(stat='identity')  +
-       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="SBP Category")) + theme(legend.position='none')
-```
+[//]:<>(![](images/sbpstages.png))
 
-![](images/sbpstages.png)
+<p align="center" width="100%">
+   <img width="50%" src="images/sbpstages.png"> 
+</p>
+
 
 ## Diastolic
 
-``` r
-df2 <- data.frame(dummydbp)
-colnames(df2) <- c("Class","Freq")
-ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
-       geom_bar(stat='identity')  +
-       scale_fill_manual(values = c("Normal"="green","Elevated"="yellow","Stage 1"="orange","Stage 2"="red")) + xlab("Category") + guides(fill=guide_legend(title="DBP Category")) + theme(legend.position='none')
-```
+[//]:<>(![](images/dbpstages.png))
 
-![](images/dbpstages.png)
+<p align="center" width="100%">
+   <img width="50%" src="images/dbpstages.png"> 
+</p>
+
 
 # Blood Pressure Metrics
 
@@ -149,7 +150,6 @@ ggplot(data=df2,aes(x=Class,y=Freq,fill=Class)) +
 ## Successive Variation (Munter et al 2011)
 
 ![](images/sucvar.png)
-
 
 ## Blood Pressure Magnitude (peak and trough) (Munter et al 2011)
 
