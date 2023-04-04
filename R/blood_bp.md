@@ -19,19 +19,12 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 
 ## LOESS of BP ~ Days
 
-[//]:<>(![](images/datetime.png))
+![](images/datetime.png)
 
-<p align="center" width="100%">
-   <img width="50%" src="images/datetime.png"> 
-</p>
 
 ## LOESS of BP ~ Hour
 
-[//]:<>(![](images/hour.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/hour.png"> 
-</p>
+![](images/hour.png)
 
 
 ## BP Classification by (Lee et al 2000)
@@ -52,57 +45,31 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 
 ## All BP values
 
-[//]:<>(![](images/hist1.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/hist1.png"> 
-</p>
-
+![](images/hist1.png)
 
 ## Systolic
 
-[//]:<>(![](images/hist2.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/hist2.png"> 
-</p>
+![](images/hist2.png)
 
 
 ## Diastolic
 
-[//]:<>(![](images/hist3.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/hist3.png"> 
-</p>
+![](images/hist3.png)
 
 
 ## Scatterplot BP  Systolic ~ Diastolic
 
-
-[//]:<>(![](images/scatter.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/scatter.png"> 
-</p>
+![](images/scatter.png)
 
 
 ## Day of Week
 
-[//]:<>(![](images/daysofweek.png))
-
-<p align="center" width="100%">
-   <img width="80%" src="images/daysofweek.png"> 
-</p>
+![](images/daysofweek.png)
 
 
 ## Time of Day
 
-[//]:<>(![](images/timeday.png))
-
-<p align="center" width="100%">
-   <img width="80%" src="images/timeday.png"> 
-</p>
+![](images/timeday.png)
 
 
 ##  American Heart Association Classification
@@ -119,20 +86,12 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 
 ## Systolic 
 
-[//]:<>(![](images/sbpstages.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/sbpstages.png"> 
-</p>
+![](images/sbpstages.png)
 
 
 ## Diastolic
 
-[//]:<>(![](images/dbpstages.png))
-
-<p align="center" width="100%">
-   <img width="50%" src="images/dbpstages.png"> 
-</p>
+![](images/dbpstages.png)
 
 
 # Blood Pressure Metrics
