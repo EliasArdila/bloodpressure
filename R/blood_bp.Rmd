@@ -16,7 +16,6 @@ library(bp)
 library(ggplot2)
 library(rmarkdown)
 library(kableExtra)
-##library(xtable)
 library(gridExtra)
 ```
 
@@ -172,6 +171,7 @@ dbpstages <- dummydbp
 
 ```{r barplot1, fig.align='center'}
 df <- data.frame(dummysbp)
+df_hist1 <- df
 colnames(df) <- c("Class","Freq")
 ggplot(data=df,aes(x=factor(Class,level=c("Normal","Elevated","Stage 1","Stage 2")),y=Freq,fill=Class)) +
        geom_bar(stat='identity',alpha=0.65,color='gray57')  +
@@ -269,5 +269,107 @@ psm %>% kbl() %>% kable_paper("hover",full_width=FALSE)
 png("images/pressmag.png",height=200,width=800)
 xxx <- tableGrob(psm,rows=NULL)
 grid.arrange(xxx)
+dev.off()
+```
+
+# Bayesian Playground
+
+```{r bayesian,message=FALSE}
+library(rstan)
+n.iter <- 100000
+n.chains <- 4
+```
+
+## Systolic
+
+````{verbatim}
+data{
+int<lower=1> N;
+real y[N];
+real nu;
+}
+parameters{
+real<lower=50,upper=200> mu;
+real<lower=0> tau;
+}
+transformed parameters{
+real<lower=0> sigma;
+sigma = sqrt(1/tau);
+}
+model{
+for(i in 1:N){
+y[i] ~ student_t(nu,mu,sigma);
+}
+mu ~ uniform(50,200);
+tau ~ gamma(0.001,0.001);
+}
+````
+
+```{r fitstan, message=FALSE,results='hide'}
+syst.dat <- list(N=length(elias$SYST),y=elias$SYST,nu=4)
+syst.fit.stan <- stan(file="syst.stan",data=syst.dat,chains=n.chains,iter=n.iter)
+```
+
+```{r stanoutput}
+print(syst.fit.stan)
+```
+
+
+```{r stanplot,fig.align='center'}
+
+plot(syst.fit.stan,show_density=TRUE,pars=c("mu"))
+
+```
+
+```{r stanplotsyst,echo=FALSE,message=FALSE,results='hide'}
+png("images/stanplotsyst.png",height=600,width=800)
+plot(syst.fit.stan,show_density=TRUE,pars=c("mu"))
+dev.off()
+
+```
+
+## Diastolic
+
+````{verbatim}
+data{
+int<lower=1> N;
+real y[N];
+real nu;
+}
+parameters{
+real<lower=60,upper=100> mu;
+real<lower=0> tau;
+}
+transformed parameters{
+real<lower=0> sigma;
+sigma = sqrt(1/tau);
+}
+model{
+for(i in 1:N){
+y[i] ~ student_t(nu,mu,sigma);
+}
+mu ~ uniform(60,100);
+tau ~ gamma(0.001,0.001);
+}
+````
+
+```{r fitstan2, message=FALSE,results='hide'}
+diast.dat <- list(N=length(elias$DIAST),y=elias$DIAST,nu=4)
+diast.fit.stan <- stan(file="diast.stan",data=diast.dat,chains=n.chains,iter=n.iter)
+```
+
+```{r stanoutput2}
+print(diast.fit.stan)
+```
+
+```{r stanplot2,fig.align='center'}
+
+plot(diast.fit.stan,show_density=TRUE,pars=c("mu"))
+
+```
+
+```{r stanplotdiast,echo=FALSE,message=FALSE,results='hide'}
+png("images/stanplotdiast.png",height=600,width=800)
+plot(diast.fit.stan,show_density=TRUE,pars=c("mu"))
 dev.off()
 ```
