@@ -1,4 +1,4 @@
----
+2---
 title: "R package bp"
 output: html_document
 author: "Elias Ardila"
@@ -372,4 +372,192 @@ plot(diast.fit.stan,show_density=TRUE,pars=c("mu"))
 png("images/stanplotdiast.png",height=600,width=800)
 plot(diast.fit.stan,show_density=TRUE,pars=c("mu"))
 dev.off()
+```
+
+# Local Level Model
+
+## Systolic
+
+```{r dlm}
+library(dlm)
+```
+
+```{r local_level_syst}
+
+build <- function(parm){
+    dlmModPoly(order=1,dV=parm[1],dW=parm[2])
+}
+
+syst <- elias$SYST
+
+fit1 <- dlmMLE(syst, c(1.0,1.0),build)
+
+dlm.syst.fitted <- build(fit1$par)
+
+dlm.syst <- dlmFilter(syst, dlm.syst.fitted)
+
+dlm.a <- dlm.syst$a
+dlm.a[1] <- NA
+
+
+dlm.syst.smooth <- dlmSmooth(syst, dlm.syst.fitted)
+```
+
+```{r locallevelsystfilter ,fig.align='center'}
+plot(syst,pch=19,type="p",xlab="",ylab="")
+lines(dlm.a)
+```
+
+```{r locallevelsystsmoothing, fig.align='center'}
+plot(syst,pch=19,type="p",xlab="",ylab="")
+lines(dlm.syst.smooth$s)
+
+```
+
+## Local Linear Model
+
+```{r , message=FALSE }
+library(KFAS)
+```
+
+```{r }
+kfas_local_linear <- function(theta,daten,a0=c(0,0),P0=c(100,100)){
+    ## =====================================
+    ## SigmaEpsilon       |    SigmaNu     |
+    ##      1             |       2        |
+    ##      1             |      2:3       |
+    ## =====================================
+ 
+    Zt <- matrix(nrow=1,ncol=2,data=c(1,0))
+    Zt
+    Tt <- matrix(nrow=2,ncol=2,data=c(1,0,1,1))
+    Tt
+    Rt <- diag(2)
+    Rt
+    SigmaEpsilon <- matrix(nrow=1,ncol=1,theta[1])
+    SigmaEpsilon
+    SigmaNu <- diag(theta[2:3])
+    SigmaNu
+    
+    a1 <- a0
+    a0
+    P1 <- diag(P0)
+    P1
+    ##P1inf <- matrix(nrow=1,ncol=1,1)
+    mm <- SSModel(daten ~  -1 + SSMcustom(Z=Zt,
+                                        T=Tt,
+                                        Q=SigmaNu,
+                                        R=Rt,
+                                        a1=a1,
+                                        P1=P1##,
+                                        ##P1inf=P1inf
+                                        ),H=SigmaEpsilon)
+    mod <- KFS(mm)
+    return(mod)
+}
+
+llkfas_local_linear <- function(theta,daten,a0=c(0,0),P0=c(100,100)){
+    mod <- kfas_local_linear(theta,daten,a0,P0)
+    return(-mod$logLik)
+}
+```
+
+## Systolic
+
+### Filtered
+
+```{r }
+theta <- rep(0.01,3)
+lower <- c(1e-6,1e-6,1e-6)
+```
+
+```{r optimlocallevel, message=FALSE, results='hide'}
+fit1 <- optim(par=theta,fn=llkfas_local_linear,daten=syst,lower=lower,method="L-BFGS-B",control=list(trace=1))
+```
+
+```{r }
+kfas.optim <- kfas_local_linear(fit1$par,syst)
+
+kfas.linear.att <- kfas.optim$att
+```
+
+```{r, message=FALSE}
+library(zoo)
+```
+
+```{r }
+kfas.local.linear.a <- coredata(kfas.linear.a)  
+
+k.a <- apply(kfas.local.linear.a,1,sum)
+
+k.a[1] <- NA
+```
+
+```{r locallinearfilter, fig.align='center'}
+plot(syst,pch=19,type="p",xlab="",ylab="")
+lines(kfas.linear.att[,1],lty=2)
+legend("topright",legend=c("Systolic","filtered"),lty=c(1,2))
+```
+
+```{r }
+alphahat <- coredata(kfas.optim$alphahat)
+k.alphahat <- apply(alphahat,1,sum)
+```
+
+## Smoothed State
+
+```{r locallinearsmoothing, fig.align='center'}
+plot(syst,pch=19,type="p",xlab="",ylab="")
+lines(alphahat[,1],lty=2)
+legend("topright",legend=c("Systolic","smoothed state"),lty=c(1,2))
+```
+
+```{r }
+library(dlm)
+theta <- c(0.1,0.1,0.1)
+
+funModel <- function(parm){
+   m1 <- dlmModPoly(dV=parm[1],dW=parm[2:3])
+   return(m1)
+}
+
+oMLE.DLM <- dlmMLE(syst, parm=theta,build=funModel)
+
+stopifnot(oMLE.DLM$convergence == 0)
+
+oFitted.DLM <- funModel(oMLE.DLM$par)
+
+oFiltered.DLM <- dlmFilter(syst,oFitted.DLM)
+
+oSmoothed.DLM <- dlmSmooth(syst,oFitted.DLM)
+
+tsSmoState.DLM <- dropFirst(oSmoothed.DLM$s)
+
+ff <- oFiltered.DLM$f
+ff[1] <- NA
+```
+```{r,fig.align='center' }
+plot(syst,pch=19)
+lines(ff,col="red")
+```
+
+```{r, fig.align='center'}
+plot(syst, pch=19)
+lines(oSmoothed.DLM$s[,1],col="red")
+legend("topright",legend=c("Systolic","smoothed state"), lty=c(1,1),col=c("black","red"))
+```
+
+## Forecast. horizont=5
+
+```{r }
+f_f <- 5
+fut1 <- dlmForecast(oFiltered.DLM,n=f_f)
+n.syst <- length(syst)
+
+tdx <- seq(n.syst + 1,n.syst + f_f)
+```
+
+```{r,fig.align='center' }
+plot(ff,type="l",xlim=c(0,tdx[f_f]))
+lines(as.numeric(fut1$f) ~ tdx,type="o",pch=16,col="red")
 ```
