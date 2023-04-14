@@ -1,4 +1,4 @@
-2---
+---
 title: "R package bp"
 output: html_document
 author: "Elias Ardila"
@@ -449,7 +449,7 @@ kfas_local_linear <- function(theta,daten,a0=c(0,0),P0=c(100,100)){
                                         Q=SigmaNu,
                                         R=Rt,
                                         a1=a1,
-                                        P1=P1##,
+                                        P1=P1,
                                         ##P1inf=P1inf
                                         ),H=SigmaEpsilon)
     mod <- KFS(mm)
@@ -479,24 +479,35 @@ fit1 <- optim(par=theta,fn=llkfas_local_linear,daten=syst,lower=lower,method="L-
 kfas.optim <- kfas_local_linear(fit1$par,syst)
 
 kfas.linear.att <- kfas.optim$att
+kfas.linear.att[1,1] <- NA 
+V_mu <- as.vector(kfas.optim$V_mu)
+
+ul <- kfas.linear.att[,1] + 1.94*sqrt(V_mu)
+ll <- kfas.linear.att[,1] - 1.94*sqrt(V_mu)
 ```
 
 ```{r, message=FALSE}
 library(zoo)
 ```
 
-```{r }
-kfas.local.linear.a <- coredata(kfas.linear.a)  
-
-k.a <- apply(kfas.local.linear.a,1,sum)
-
-k.a[1] <- NA
-```
-
 ```{r locallinearfilter, fig.align='center'}
 plot(syst,pch=19,type="p",xlab="",ylab="")
 lines(kfas.linear.att[,1],lty=2)
-legend("topright",legend=c("Systolic","filtered"),lty=c(1,2))
+lines(ul, lty=3,col="red")
+lines(ll, lty=3,col="red")
+##lines(kfas.optim$muhat,lty=2)
+legend("topright",legend=c("Systolic","filtered"),lty=c(NA,2),pch=c(19,NA))
+```
+
+
+```{r kfaslocallinearfilter,echo=FALSE,message=FALSE,results='hide'}
+png("images/locallinearfilter.png",height=600,width=800)
+plot(syst,pch=19,type="p",xlab="",ylab="")
+lines(kfas.linear.att[,1],lty=2)
+lines(ul, lty=3,col="red")
+lines(ll, lty=3,col="red")
+legend("topright",legend=c("Systolic","filtered"),lty=c(NA,2),pch=c(19,NA))
+dev.off()
 ```
 
 ```{r }
@@ -509,7 +520,7 @@ k.alphahat <- apply(alphahat,1,sum)
 ```{r locallinearsmoothing, fig.align='center'}
 plot(syst,pch=19,type="p",xlab="",ylab="")
 lines(alphahat[,1],lty=2)
-legend("topright",legend=c("Systolic","smoothed state"),lty=c(1,2))
+legend("topright",legend=c("Systolic","smoothed state"),lty=c(NA,2),pch=c(19,NA))
 ```
 
 ```{r }
@@ -517,11 +528,11 @@ library(dlm)
 theta <- c(0.1,0.1,0.1)
 
 funModel <- function(parm){
-   m1 <- dlmModPoly(dV=parm[1],dW=parm[2:3])
+   m1 <- dlmModPoly(dV=exp(parm[1]),dW=exp(parm[2:3]))
    return(m1)
 }
 
-oMLE.DLM <- dlmMLE(syst, parm=theta,build=funModel)
+oMLE.DLM <- dlmMLE(syst, parm=log(theta),build=funModel)
 
 stopifnot(oMLE.DLM$convergence == 0)
 
@@ -533,9 +544,11 @@ oSmoothed.DLM <- dlmSmooth(syst,oFitted.DLM)
 
 tsSmoState.DLM <- dropFirst(oSmoothed.DLM$s)
 
-ff <- oFiltered.DLM$f
+ff <- oFiltered.DLM$m[,1]
 ff[1] <- NA
+
 ```
+
 ```{r,fig.align='center' }
 plot(syst,pch=19)
 lines(ff,col="red")
@@ -560,4 +573,12 @@ tdx <- seq(n.syst + 1,n.syst + f_f)
 ```{r,fig.align='center' }
 plot(ff,type="l",xlim=c(0,tdx[f_f]))
 lines(as.numeric(fut1$f) ~ tdx,type="o",pch=16,col="red")
+```
+
+
+```{r forecastn5,echo=FALSE,message=FALSE,results='hide'}
+png("images/forecast.png",height=600,width=800)
+plot(ff,type="l",xlim=c(0,tdx[f_f]))
+lines(as.numeric(fut1$f) ~ tdx,type="o",pch=16,col="red")
+dev.off()
 ```
