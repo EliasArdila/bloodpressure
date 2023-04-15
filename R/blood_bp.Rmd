@@ -455,7 +455,46 @@ kfas_local_linear <- function(theta,daten,a0=c(0,0),P0=c(100,100)){
     mod <- KFS(mm)
     return(mod)
 }
+```
 
+```{r, echo=FALSE}
+model_kfas_local_linear <- function(theta,daten,a0=c(0,0),P0=c(100,100)){
+    ## =====================================
+    ## SigmaEpsilon       |    SigmaNu     |
+    ##      1             |       2        |
+    ##      1             |      2:3       |
+    ## =====================================
+ 
+    Zt <- matrix(nrow=1,ncol=2,data=c(1,0))
+    Zt
+    Tt <- matrix(nrow=2,ncol=2,data=c(1,0,1,1))
+    Tt
+    Rt <- diag(2)
+    Rt
+    SigmaEpsilon <- matrix(nrow=1,ncol=1,theta[1])
+    SigmaEpsilon
+    SigmaNu <- diag(theta[2:3])
+    SigmaNu
+    
+    a1 <- a0
+    a0
+    P1 <- diag(P0)
+    P1
+    ##P1inf <- matrix(nrow=1,ncol=1,1)
+    mm <- SSModel(daten ~  -1 + SSMcustom(Z=Zt,
+                                        T=Tt,
+                                        Q=SigmaNu,
+                                        R=Rt,
+                                        a1=a1,
+                                        P1=P1,
+                                        ##P1inf=P1inf
+                                        ),H=SigmaEpsilon)
+
+    return(mm)
+}
+```
+
+```{r }
 llkfas_local_linear <- function(theta,daten,a0=c(0,0),P0=c(100,100)){
     mod <- kfas_local_linear(theta,daten,a0,P0)
     return(-mod$logLik)
@@ -482,8 +521,8 @@ kfas.linear.att <- kfas.optim$att
 kfas.linear.att[1,1] <- NA 
 V_mu <- as.vector(kfas.optim$V_mu)
 
-ul <- kfas.linear.att[,1] + 1.94*sqrt(V_mu)
-ll <- kfas.linear.att[,1] - 1.94*sqrt(V_mu)
+ul <- kfas.linear.att[,1] + qnorm(1-0.025)*sqrt(V_mu)
+ll <- kfas.linear.att[,1] + qnorm(0.025)*sqrt(V_mu)
 ```
 
 ```{r, message=FALSE}
@@ -491,37 +530,63 @@ library(zoo)
 ```
 
 ```{r locallinearfilter, fig.align='center'}
-plot(syst,pch=19,type="p",xlab="",ylab="")
+plot(syst ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
 lines(kfas.linear.att[,1],lty=2)
-lines(ul, lty=3,col="red")
-lines(ll, lty=3,col="red")
-##lines(kfas.optim$muhat,lty=2)
-legend("topright",legend=c("Systolic","filtered"),lty=c(NA,2),pch=c(19,NA))
+lines(ul , lty=3,col="red")
+lines(ll , lty=3,col="red")
+legend("bottomright",legend=c("Systolic","filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
+        col=c("darkgrey","black","red"),cex=.9,bty="n")
 ```
 
 
 ```{r kfaslocallinearfilter,echo=FALSE,message=FALSE,results='hide'}
 png("images/locallinearfilter.png",height=600,width=800)
-plot(syst,pch=19,type="p",xlab="",ylab="")
+plot(syst,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
 lines(kfas.linear.att[,1],lty=2)
 lines(ul, lty=3,col="red")
 lines(ll, lty=3,col="red")
-legend("topright",legend=c("Systolic","filtered"),lty=c(NA,2),pch=c(19,NA))
+legend("bottomright",legend=c("Systolic","filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
+        col=c("darkgrey","black","red"),cex=.9,bty="n")
 dev.off()
 ```
 
 ```{r }
+mod.kfas <- model_kfas_local_linear(fit1$par,syst)
+syst.pred <- predict(mod.kfas,n.ahead=5)
+```
+
+```{r }
 alphahat <- coredata(kfas.optim$alphahat)
+nsyst <- dim(alphahat)[1]
+xt <- 1:nsyst
+n.ahead <- 5
+xxt <- (nsyst+1):(nsyst+n.ahead)
 k.alphahat <- apply(alphahat,1,sum)
+
 ```
 
 ## Smoothed State
 
+
 ```{r locallinearsmoothing, fig.align='center'}
-plot(syst,pch=19,type="p",xlab="",ylab="")
-lines(alphahat[,1],lty=2)
-legend("topright",legend=c("Systolic","smoothed state"),lty=c(NA,2),pch=c(19,NA))
+plot(syst ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(100,160))
+lines(alphahat[,1] ~ xt,lty=2)
+lines(coredata(syst.pred) ~ xxt,type="o",col="red",pch=19)
+legend("bottomright",legend=c("Systolic","Smoothed","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
+col=c("darkgrey","black","red"),cex=.9,bty="n")
 ```
+
+```{r locallinearsmoothingforecast,echo=FALSE,message=FALSE,results='hide'}
+png("images/forecastkfas.png",height=600,width=800)
+plot(syst ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(100,160))
+lines(alphahat[,1] ~ xt,lty=2)
+lines(coredata(syst.pred) ~ xxt,type="o",col="red",pch=19)
+legend("bottomright",legend=c("Systolic","Smoothed","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
+col=c("darkgrey","black","red"),cex=.9,bty="n")
+dev.off()
+```
+
+## DLM
 
 ```{r }
 library(dlm)
@@ -544,7 +609,7 @@ oSmoothed.DLM <- dlmSmooth(syst,oFitted.DLM)
 
 tsSmoState.DLM <- dropFirst(oSmoothed.DLM$s)
 
-ff <- oFiltered.DLM$m[,1]
+ff <- oFiltered.DLM$f
 ff[1] <- NA
 
 ```
@@ -560,7 +625,7 @@ lines(oSmoothed.DLM$s[,1],col="red")
 legend("topright",legend=c("Systolic","smoothed state"), lty=c(1,1),col=c("black","red"))
 ```
 
-## Forecast. horizont=5
+## Forecast. n.Ahead=5
 
 ```{r }
 f_f <- 5
@@ -571,14 +636,20 @@ tdx <- seq(n.syst + 1,n.syst + f_f)
 ```
 
 ```{r,fig.align='center' }
-plot(ff,type="l",xlim=c(0,tdx[f_f]))
+plot(syst,type="o",col="darkgrey",xlab="",xlim=c(0,tdx[f_f]),pch=19,ylab="",ylim=c(100,160))
+lines(ff,lty=2)
 lines(as.numeric(fut1$f) ~ tdx,type="o",pch=16,col="red")
+legend("bottomright",legend=c("Systolic","Filtered","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
+col=c("darkgrey","black","red"),cex=.9,bty="n")
 ```
 
 
 ```{r forecastn5,echo=FALSE,message=FALSE,results='hide'}
 png("images/forecast.png",height=600,width=800)
-plot(ff,type="l",xlim=c(0,tdx[f_f]))
+plot(syst,type="o",col="darkgrey",xlab="",xlim=c(0,tdx[f_f]),pch=19,ylab="",ylim=c(100,160))
+lines(ff,lty=2)
 lines(as.numeric(fut1$f) ~ tdx,type="o",pch=16,col="red")
+legend("bottomright",legend=c("Systolic","Filtered","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
+col=c("darkgrey","black","red"),cex=.9,bty="n")
 dev.off()
 ```
