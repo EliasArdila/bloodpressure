@@ -180,3 +180,13 @@ tau ~ gamma(0.001,0.001);
 ## Forecast. n.Ahead=5
 
 ![](images/forecast.png)
+
+
+## Diastolic. Local Linear Filtered
+
+
+![](images/locallinearfilterdiast.png)
+
+## Forecast. n.Ahead=5
+
+![](images/forecastdiast.png)
