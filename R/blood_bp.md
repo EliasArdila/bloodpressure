@@ -177,6 +177,6 @@ tau ~ gamma(0.001,0.001);
 ![](images/locallinearfilter.png)
 
 
-## Forecast. Horizont=5
+## Forecast. n.Ahead=5
 
 ![](images/forecast.png)
