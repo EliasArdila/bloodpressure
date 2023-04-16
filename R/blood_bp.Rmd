@@ -521,8 +521,22 @@ kfas.linear.att <- kfas.optim$att
 kfas.linear.att[1,1] <- NA 
 V_mu <- as.vector(kfas.optim$V_mu)
 
-ul <- kfas.linear.att[,1] + qnorm(1-0.025)*sqrt(V_mu)
-ll <- kfas.linear.att[,1] + qnorm(0.025)*sqrt(V_mu)
+N <- length(syst)
+
+ul <- rep(0,N)
+ll <- rep(0,N)
+ulpt <- rep(0,N)
+llpt <- rep(0,N)
+
+i <- 1
+
+while(i <= N){
+   ulpt[i] <- kfas.linear.att[i,1] + qnorm(1-0.025)*sqrt(diag(kfas.optim$Ptt[,,i])[1])
+   llpt[i] <- kfas.linear.att[i,1] + qnorm(0.025)*sqrt(diag(kfas.optim$Ptt[,,i])[1])
+   ul[i] <- kfas.optim$alphahat[i,1] +  qnorm(1-0.025)*sqrt(V_mu[i])
+   ll[i] <- kfas.optim$alphahat[i,1] + qnorm(0.025)*sqrt(V_mu[i])
+   i <- i + 1
+}
 ```
 
 ```{r, message=FALSE}
@@ -532,20 +546,20 @@ library(zoo)
 ```{r locallinearfilter, fig.align='center'}
 plot(syst ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
 lines(kfas.linear.att[,1],lty=2)
-lines(ul , lty=3,col="red")
-lines(ll , lty=3,col="red")
-legend("bottomright",legend=c("Systolic","filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
+lines(ulpt,lty=3,col="red")
+lines(llpt,lty=3,col="red")
+legend("bottomright",legend=c("Systolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 ```
 
 
 ```{r kfaslocallinearfilter,echo=FALSE,message=FALSE,results='hide'}
 png("images/locallinearfilter.png",height=600,width=800)
-plot(syst,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
+plot(syst ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
 lines(kfas.linear.att[,1],lty=2)
-lines(ul, lty=3,col="red")
-lines(ll, lty=3,col="red")
-legend("bottomright",legend=c("Systolic","filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
+lines(ulpt,lty=3,col="red")
+lines(llpt,lty=3,col="red")
+legend("bottomright",legend=c("Systolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 dev.off()
 ```
@@ -571,18 +585,22 @@ k.alphahat <- apply(alphahat,1,sum)
 ```{r locallinearsmoothing, fig.align='center'}
 plot(syst ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(100,160))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(syst.pred) ~ xxt,type="o",col="red",pch=19)
-legend("bottomright",legend=c("Systolic","Smoothed","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
-col=c("darkgrey","black","red"),cex=.9,bty="n")
+lines(coredata(syst.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(ul,lty=3,col="red")
+lines(ll,lty=3,col="red")
+legend("bottomright",legend=c("Systolic","Smoothed","Predicted","95% limits" ),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
+col=c("darkgrey","black","magenta","red"),cex=.9,bty="n")
 ```
 
 ```{r locallinearsmoothingforecast,echo=FALSE,message=FALSE,results='hide'}
 png("images/forecastkfas.png",height=600,width=800)
 plot(syst ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(100,160))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(syst.pred) ~ xxt,type="o",col="red",pch=19)
-legend("bottomright",legend=c("Systolic","Smoothed","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
-col=c("darkgrey","black","red"),cex=.9,bty="n")
+lines(coredata(syst.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(ul,lty=3,col="red")
+lines(ll,lty=3,col="red")
+legend("bottomright",legend=c("Systolic","Smoothed","Predicted","95% limits" ),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
+col=c("darkgrey","black","magenta","red"),cex=.9,bty="n")
 dev.off()
 ```
 
@@ -675,8 +693,25 @@ kfas.linear.att.diast <- kfas.optim.diast$att
 kfas.linear.att.diast[1,1] <- NA 
 V_mu.diast <- as.vector(kfas.optim.diast$V_mu)
 
-ul <- kfas.linear.att.diast[,1] + qnorm(1-0.025)*sqrt(V_mu.diast)
-ll <- kfas.linear.att.diast[,1] + qnorm(0.025)*sqrt(V_mu.diast)
+N <- length(diast)
+
+ul <- rep(0,N)
+ll <- rep(0,N)
+ulpt.diast <- rep(0,N)
+llpt.diast <- rep(0,N)
+
+i <- 1
+
+while(i <= N){
+   ulpt.diast[i] <- kfas.linear.att.diast[i,1] + qnorm(1-0.025)*sqrt(diag(kfas.optim.diast$Ptt[,,i])[1])
+   llpt.diast[i] <- kfas.linear.att.diast[i,1] + qnorm(0.025)*sqrt(diag(kfas.optim.diast$Ptt[,,i])[1])
+   ul[i] <- kfas.optim.diast$alphahat[i,1] +  qnorm(1-0.025)*sqrt(V_mu.diast[i])
+   ll[i] <- kfas.optim.diast$alphahat[i,1] +  qnorm(0.025)*sqrt(V_mu.diast[i])
+
+   i <- i + 1
+}
+
+
 ```
 
 ```{r, message=FALSE}
@@ -686,9 +721,9 @@ library(zoo)
 ```{r locallinearfilter.diast , fig.align='center'}
 plot(diast ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(60,100))
 lines(kfas.linear.att.diast[,1],lty=2)
-lines(ul , lty=3,col="red")
-lines(ll , lty=3,col="red")
-legend("bottomright",legend=c("Diastolic","filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
+lines(ulpt.diast , lty=3,col="red")
+lines(llpt.diast , lty=3,col="red")
+legend("bottomright",legend=c("Diastolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 ```
 
@@ -699,7 +734,7 @@ plot(diast ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(60,100))
 lines(kfas.linear.att.diast[,1],lty=2)
 lines(ul , lty=3,col="red")
 lines(ll , lty=3,col="red")
-legend("bottomright",legend=c("Diastolic","filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
+legend("bottomright",legend=c("Diastolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 dev.off()
 ```
@@ -725,18 +760,22 @@ k.alphahat <- apply(alphahat,1,sum)
 ```{r locallinearsmoothing.diast, fig.align='center'}
 plot(diast ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(60,100))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(diast.pred) ~ xxt,type="o",col="red",pch=19)
-legend("bottomright",legend=c("Diastolic","Smoothed","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
-col=c("darkgrey","black","red"),cex=.9,bty="n")
+lines(coredata(diast.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(ul,lty=3,col="red")
+lines(ll,lty=3,col="red")
+legend("bottomright",legend=c("Diastolic","Smoothed","Predicted","95% limits"),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
+col=c("darkgrey","black","magenta","red"),cex=.9,bty="n")
 ```
 
 ```{r locallinearsmoothingforecast.diast,echo=FALSE,message=FALSE,results='hide'}
 png("images/forecastkfasdiast.png",height=600,width=800)
 plot(diast ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(60,100))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(diast.pred) ~ xxt,type="o",col="red",pch=19)
-legend("bottomright",legend=c("Diastolic","Smoothed","Predicted"),lty=c(1,2,1),pch=c(19,NA,19),
-col=c("darkgrey","black","red"),cex=.9,bty="n")
+lines(coredata(diast.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(ul,lty=3,col="red")
+lines(ll,lty=3,col="red")
+legend("bottomright",legend=c("Diastolic","Smoothed","Predicted","95% limits"),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
+col=c("darkgrey","black","magenta","red"),cex=.9,bty="n")
 dev.off()
 ```
 
