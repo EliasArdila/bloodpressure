@@ -732,8 +732,8 @@ legend("bottomright",legend=c("Diastolic","Filtered","95% limits"),lty=c(1,2,3),
 png("images/locallinearfilterdiast.png",height=600,width=800)
 plot(diast ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(60,100))
 lines(kfas.linear.att.diast[,1],lty=2)
-lines(ul , lty=3,col="red")
-lines(ll , lty=3,col="red")
+lines(ulpt.diast , lty=3,col="red")
+lines(llpt.diast , lty=3,col="red")
 legend("bottomright",legend=c("Diastolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 dev.off()

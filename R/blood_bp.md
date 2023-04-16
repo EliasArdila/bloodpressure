@@ -177,9 +177,9 @@ tau ~ gamma(0.001,0.001);
 ![](images/locallinearfilter.png)
 
 
-## Forecast. n.Ahead=5
+## Forecast. Smoothed State. n.Ahead=5
 
-![](images/forecast.png)
+![](images/forecastkfas.png)
 
 
 ## Diastolic. Local Linear Filtered
@@ -187,6 +187,6 @@ tau ~ gamma(0.001,0.001);
 
 ![](images/locallinearfilterdiast.png)
 
-## Forecast. n.Ahead=5
+## Forecast. Smoothed State. n.Ahead=5
 
-![](images/forecastdiast.png)
+![](images/forecastkfasdiast.png)
