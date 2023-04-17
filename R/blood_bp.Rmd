@@ -566,7 +566,7 @@ dev.off()
 
 ```{r }
 mod.kfas <- model_kfas_local_linear(fit1$par,syst)
-syst.pred <- predict(mod.kfas,n.ahead=5)
+syst.pred <- predict(mod.kfas,n.ahead=5,interval="prediction")
 ```
 
 ```{r }
@@ -585,7 +585,9 @@ k.alphahat <- apply(alphahat,1,sum)
 ```{r locallinearsmoothing, fig.align='center'}
 plot(syst ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(100,160))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(syst.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(syst.pred[,1]) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(syst.pred[,2]) ~ xxt,col="blue")
+lines(coredata(syst.pred[,3]) ~ xxt,col="blue")
 lines(ul,lty=3,col="red")
 lines(ll,lty=3,col="red")
 legend("bottomright",legend=c("Systolic","Smoothed","Predicted","95% limits" ),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
@@ -596,7 +598,9 @@ col=c("darkgrey","black","magenta","red"),cex=.9,bty="n")
 png("images/forecastkfas.png",height=600,width=800)
 plot(syst ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(100,160))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(syst.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(syst.pred[,1]) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(syst.pred[,2]) ~ xxt,col="blue")
+lines(coredata(syst.pred[,3]) ~ xxt,col="blue")
 lines(ul,lty=3,col="red")
 lines(ll,lty=3,col="red")
 legend("bottomright",legend=c("Systolic","Smoothed","Predicted","95% limits" ),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
@@ -741,7 +745,7 @@ dev.off()
 
 ```{r }
 mod.kfas.diast <- model_kfas_local_linear(fit1.diast$par,diast)
-diast.pred <- predict(mod.kfas.diast,n.ahead=5)
+diast.pred <- predict(mod.kfas.diast,n.ahead=5,interval="prediction")
 ```
 
 ```{r }
@@ -760,7 +764,9 @@ k.alphahat <- apply(alphahat,1,sum)
 ```{r locallinearsmoothing.diast, fig.align='center'}
 plot(diast ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(60,100))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(diast.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(diast.pred[,1]) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(diast.pred[,2]) ~ xxt,col="blue")
+lines(coredata(diast.pred[,3]) ~ xxt,col="blue")
 lines(ul,lty=3,col="red")
 lines(ll,lty=3,col="red")
 legend("bottomright",legend=c("Diastolic","Smoothed","Predicted","95% limits"),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
@@ -771,7 +777,9 @@ col=c("darkgrey","black","magenta","red"),cex=.9,bty="n")
 png("images/forecastkfasdiast.png",height=600,width=800)
 plot(diast ~ xt,pch=19,type="o",xlab="",ylab="", xlim=c(1, nsyst + n.ahead),col="darkgrey",ylim=c(60,100))
 lines(alphahat[,1] ~ xt,lty=2)
-lines(coredata(diast.pred) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(diast.pred[,1]) ~ xxt,type="o",col="magenta",pch=19)
+lines(coredata(diast.pred[,2]) ~ xxt,col="blue")
+lines(coredata(diast.pred[,3]) ~ xxt,col="blue")
 lines(ul,lty=3,col="red")
 lines(ll,lty=3,col="red")
 legend("bottomright",legend=c("Diastolic","Smoothed","Predicted","95% limits"),lty=c(1,2,1,1),pch=c(19,NA,19,NA),
