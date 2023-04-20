@@ -99,3 +99,14 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 ## Forecast. Smoothed State. n.Ahead=5
 
 ![](images/forecastkfasdiast.png)
+
+
+# Student-t Local Linear
+
+## Systolic
+
+![](images/studentforecastsyst.png)
+
+## Diastolic
+
+![](images/studentforecastdiast.png)

@@ -850,3 +850,67 @@ abline(a=0,b=1,lty=2,col="indianred",lwd=2)
 ```{r }
 t.test(diast)
 ```
+
+# BSTS
+
+
+```{r, message=FALSE }
+library(bsts)
+```
+## Systolic
+
+```{r, message=FALSE,results='hide'}
+ss1 <- AddLocalLinearTrend(list(), syst)
+model1 <- bsts(syst, state.specification = ss1, niter = 1000)
+pred1 <- predict(model1, horizon = 5)
+```
+
+```{r, fig.align='center' }
+plot(pred1,ylim=range(pred1))
+
+```
+
+```{r, message=FALSE,results='hide' }
+ss2 <- AddSemilocalLinearTrend(list(), syst)
+model2 <- bsts(syst, state.specification = ss2, niter = 1000)
+pred2 <- predict(model2, horizon = 5 )
+```
+
+```{r, fig.align='center'}
+plot(pred2,ylim = range(pred2))
+```
+
+```{r, message=FALSE,results='hide' }
+ss3 <- AddStudentLocalLinearTrend(list(), syst)
+model3 <- bsts(syst, state.specification = ss3, niter = 1000)
+pred3 <- predict(model3, horizon = 5 )
+```
+
+```{r, fig.align='center'}
+plot(pred3,ylim = range(pred3),main="StudentLocalLinear Systolic")
+```
+
+```{r, echo=FALSE,message=FALSE,results='hide'}
+png("images/studentforecastsyst.png",height=600,width=800)
+plot(pred3,ylim = range(pred3),main="StudentLocalLinear Systolic")
+dev.off()
+```
+
+
+## Diastolic
+
+```{r, message=FALSE,results='hide' }
+sss3 <- AddStudentLocalLinearTrend(list(), diast)
+models3 <- bsts(diast, state.specification = sss3, niter = 1000)
+preds3 <- predict(models3, horizon = 5 )
+```
+
+```{r, fig.align='center'}
+plot(preds3,ylim = range(preds3),main="StudentLocalLinear Diastolic")
+```
+
+```{r, echo=FALSE,message=FALSE,results='hide'}
+png("images/studentforecastdiast.png",height=600,width=800)
+plot(preds3,ylim = range(preds3),main="StudentLocalLinear Diastolic")
+dev.off()
+```
