@@ -533,21 +533,22 @@ library(zoo)
 ```
 
 ```{r locallinearfilter, fig.align='center'}
-plot(syst ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
-lines(kfas.linear.att[,1],lty=2)
-lines(ulpt,lty=3,col="red")
-lines(llpt,lty=3,col="red")
+plot(syst  ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
+lines(kfas.linear.att[,1] ,lty=2)
+lines(ulpt , lty=3,col="red")
+lines(llpt ,lty=3,col="red")
 legend("bottomright",legend=c("Systolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 ```
 
 
+
 ```{r kfaslocallinearfilter,echo=FALSE,message=FALSE,results='hide'}
 png("images/locallinearfilter.png",height=600,width=800)
-plot(syst ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
-lines(kfas.linear.att[,1],lty=2)
-lines(ulpt,lty=3,col="red")
-lines(llpt,lty=3,col="red")
+plot(syst   ,pch=19,type="o",xlab="",ylab="",col="darkgrey",ylim=c(100,160))
+lines(kfas.linear.att[,1]  ,lty=2)
+lines(ulpt  ,lty=3,col="red")
+lines(llpt  ,lty=3,col="red")
 legend("bottomright",legend=c("Systolic","Filtered","95% limits"),lty=c(1,2,3),pch=c(19,NA,NA),
         col=c("darkgrey","black","red"),cex=.9,bty="n")
 dev.off()
@@ -825,7 +826,7 @@ dev.off()
 ```
 
 ```{r, fig.align='center'}
-hist(syst,nclass=10,col="steelblue",prob=TRUE,main="Syst")
+hist(syst,nclass=10,col="steelblue",prob=TRUE,main="Systolic")
 ```
 
 ```{r, fig.align='center' }
@@ -839,7 +840,7 @@ t.test(syst)
 
 
 ```{r, fig.align='center'}
-hist(diast,nclass=10,col="steelblue",prob=TRUE,main="Syst")
+hist(diast,nclass=10,col="steelblue",prob=TRUE,main="Diastolic")
 ```
 
 ```{r, fig.align='center' }
