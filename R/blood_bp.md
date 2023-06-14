@@ -114,7 +114,7 @@ eliasbp <- process_data(elias,sbp='syst',dbp='diast',date_time='date.time',id='i
 
 ![](images/pressmag.png)
 
-# Bayesian ANALYSIS
+# Bayesian Playground
 
 ## Systolic
 
